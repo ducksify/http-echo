@@ -4,9 +4,6 @@ on: [workflow_dispatch, push]
 
 env:
   PKG_NAME: "http-echo"
-  EXO_REGISTRY: exo.container-registry.com
-  EXO_REPO_NAME: panop/http-echo
-
 
 jobs:
   get-go-version:
@@ -61,44 +58,10 @@ jobs:
           name: metadata.json
           path: ${{ steps.generate-metadata-file.outputs.filepath }}
 
-  build-linux:
-    needs:
-      - get-go-version
-      - set-product-version
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux]
-        goarch: ["amd64"]
-
-      fail-fast: true
-
-    name: Go ${{ needs.get-go-version.outputs.go-version }} ${{ matrix.goos }} ${{ matrix.goarch }} build
-
-    steps:
-      - uses: actions/checkout@v3 # v3.5.3
-
-      - uses: hashicorp/actions-go-build@v1
-        env:
-          BASE_VERSION: ${{ needs.set-product-version.outputs.product-base-version }}
-          PRERELEASE_VERSION: ${{ needs.set-product-version.outputs.product-prerelease-version}}
-          METADATA_VERSION: ${{ env.METADATA }}
-        with:
-          product_name: ${{ env.PKG_NAME }}
-          product_version: ${{ needs.set-product-version.outputs.product-version }}
-          go_version: ${{ needs.get-go-version.outputs.go-version }}
-          os: ${{ matrix.goos }}
-          arch: ${{ matrix.goarch }}
-          reproducible: report
-          instructions: |
-            cp LICENSE $TARGET_DIR/LICENSE.txt
-            make build
-
   build-docker-default:
     name: Docker ${{ matrix.arch }} default release build
     needs:
       - set-product-version
-      - build-linux
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -121,5 +84,5 @@ jobs:
         with:
           context: ./
           push: true
-          tags: latest
-
+          tags: exo.container-registry.com/panop/http-echo:latest
+          

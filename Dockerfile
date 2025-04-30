@@ -1,25 +1,18 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
+FROM golang:1.23-bullseye AS build
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DNSX_RELEASE="1.2.1"
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends upx wget unzip
+
+COPY . ./
+RUN go mod download 
+
+RUN go build -ldflags "-s -w" -o /http-echo \
+    && upx /http-echo
 
 FROM gcr.io/distroless/static-debian12:nonroot as default
 
-# TARGETOS and TARGETARCH are set automatically when --platform is provided.
-ARG TARGETOS
-ARG TARGETARCH
-ARG PRODUCT_VERSION
-ARG BIN_NAME
-ENV PRODUCT_NAME=$BIN_NAME
-
-LABEL name="http-echo" \
-      maintainer="HashiCorp Consul Team <consul@hashicorp.com>" \
-      vendor="HashiCorp" \
-      version=$PRODUCT_VERSION \
-      release=$PRODUCT_VERSION \
-      licenses="MPL-2.0" \
-      summary="A test webserver that echos a response. You know, for kids."
-
-COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /
-COPY LICENSE /usr/share/doc/$PRODUCT_NAME/LICENSE.txt
+COPY --from=build /http-echo /http-echo
 
 EXPOSE 5678/tcp
 
