@@ -17,7 +17,7 @@ const (
 	httpHeaderAppVersion string = "X-App-Version"
 
 	httpLogDateFormat string = "2006/01/02 15:04:05"
-	httpLogFormat     string = "%v %s %s \"%s %s %s\" %d %d \"%s\" %v\n"
+	httpLogFormat     string = "%v %s %s \"%s %s %s\"  %s %s %d %d \"%s\" %v\n"
 )
 
 // withAppHeaders adds application headers such as X-App-Version and X-App-Name.
@@ -72,7 +72,7 @@ func httpLog(out io.Writer, h http.HandlerFunc) http.HandlerFunc {
 			dur := end.Sub(start)
 			fmt.Fprintf(out, httpLogFormat,
 				end.Format(httpLogDateFormat),
-				r.Host, r.RemoteAddr, r.Method, r.URL.Path, r.Proto,
+				r.Host, r.RemoteAddr, r.Method, r.URL.Path, r.Proto, r.Header, r.URL.RawQuery,
 				status, length, r.UserAgent(), dur)
 		}(time.Now())
 
