@@ -4,6 +4,9 @@ on: [workflow_dispatch, push]
 
 env:
   PKG_NAME: "http-echo"
+  EXO_REGISTRY: exo.container-registry.com
+  EXO_REPO_NAME: panop/http-echo
+
 
 jobs:
   get-go-version:
@@ -84,5 +87,5 @@ jobs:
         with:
           context: ./
           push: true
-          tags: exo.container-registry.com/panop/http-echo:latest
+          tags: ${{ env.EXO_REGISTRY }}/${{ env.EXO_REPO_NAME }}:latest
           
