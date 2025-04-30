@@ -1,6 +1,5 @@
 FROM golang:1.23-bullseye AS build
 ENV DEBIAN_FRONTEND=noninteractive
-ENV DNSX_RELEASE="1.2.1"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends upx wget unzip
 
