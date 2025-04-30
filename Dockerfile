@@ -9,7 +9,8 @@ RUN go mod download
 RUN go build -ldflags "-s -w" -o /http-echo \
     && upx /http-echo
 
-FROM gcr.io/distroless/static-debian12:nonroot as default
+#FROM gcr.io/distroless/static-debian12:nonroot as default
+FROM debian:12-slim
 
 COPY --from=build /http-echo /http-echo
 
